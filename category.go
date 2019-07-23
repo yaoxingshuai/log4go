@@ -1,21 +1,28 @@
 package log4go
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"strings"
 	"time"
 )
 
+var defaultSkip = 2
+
 // LOGGER get the log Filter by category
 func LOGGER(category string) *Filter {
 	f, ok := Global[category]
 	if !ok {
-		f = &Filter{CRITICAL, NewConsoleLogWriter(), "DEFAULT"}  
+		f = &Filter{CRITICAL, NewConsoleLogWriter(), "DEFAULT"}
 	} else {
 		f.Category = category
 	}
 	return f
+}
+
+func SetSkip(newSkip int) {
+	defaultSkip = newSkip
 }
 
 // Send a formatted log message internally
@@ -31,7 +38,7 @@ func (f *Filter) intLogf(lvl Level, format string, args ...interface{}) {
 	}
 
 	// Determine caller func
-	pc, _, lineno, ok := runtime.Caller(2)
+	pc, _, lineno, ok := runtime.Caller(defaultSkip)
 	src := ""
 	if ok {
 		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
@@ -84,7 +91,7 @@ func (f *Filter) intLogc(lvl Level, closure func() string) {
 	}
 
 	// Determine caller func
-	pc, _, lineno, ok := runtime.Caller(2)
+	pc, _, lineno, ok := runtime.Caller(defaultSkip)
 	src := ""
 	if ok {
 		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
@@ -101,7 +108,7 @@ func (f *Filter) intLogc(lvl Level, closure func() string) {
 
 	default_filter := Global["stdout"]
 
-	if default_filter != nil &&  lvl > default_filter.Level {
+	if default_filter != nil && lvl > default_filter.Level {
 		default_filter.LogWrite(rec)
 	}
 
@@ -325,4 +332,43 @@ func (f *Filter) Critical(arg0 interface{}, args ...interface{}) {
 		msg = fmt.Sprintf(fmt.Sprint(first)+strings.Repeat(" %v", len(args)), args...)
 	}
 	f.intLogf(lvl, msg)
+}
+
+func (f *Filter) Print(v ...interface{}) {
+	const (
+		lvl = DEBUG //为了提供gorm log的interface
+	)
+	arg0 := v[0]
+	args := v[1:]
+	switch first := arg0.(type) {
+	case string:
+		// Use the string as a format string
+		f.intLogf(lvl, first, args...)
+	case func() string:
+		// f the closure (no other arguments used)
+		f.intLogc(lvl, first)
+	default:
+		// Build a format string so that it will be similar to Sprint
+		f.intLogf(lvl, fmt.Sprint(arg0)+strings.Repeat(" %v", len(args)), args...)
+	}
+}
+
+func (f *Filter) QDebug(ctx context.Context, arg0 string, args ...interface{}) {
+	f.intLogf(DEBUG, getPrefix(ctx, arg0), args)
+}
+
+func (f *Filter) QInfo(ctx context.Context, arg0 string, args ...interface{}) {
+	f.intLogf(INFO, getPrefix(ctx, arg0), args)
+}
+
+func (f *Filter) QWarn(ctx context.Context, arg0 string, args ...interface{}) {
+	f.intLogf(WARNING, getPrefix(ctx, arg0), args)
+}
+
+func (f *Filter) QError(ctx context.Context, arg0 string, args ...interface{}) {
+	f.intLogf(ERROR, getPrefix(ctx, arg0), args)
+}
+
+func getPrefix(ctx context.Context, arg0 string) string {
+	return fmt.Sprintf("requestId=%#v, %s", ctx.Value("requestId"), arg0)
 }
