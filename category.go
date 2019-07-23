@@ -38,10 +38,10 @@ func (f *Filter) intLogf(lvl Level, format string, args ...interface{}) {
 	}
 
 	// Determine caller func
-	pc, _, lineno, ok := runtime.Caller(defaultSkip)
+	pc, fileName, lineno, ok := runtime.Caller(defaultSkip)
 	src := ""
 	if ok {
-		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
+		src = fmt.Sprintf("%s:%s:%d", fileName, runtime.FuncForPC(pc).Name(), lineno)
 	}
 
 	msg := format
@@ -91,10 +91,10 @@ func (f *Filter) intLogc(lvl Level, closure func() string) {
 	}
 
 	// Determine caller func
-	pc, _, lineno, ok := runtime.Caller(defaultSkip)
+	pc, fileName, lineno, ok := runtime.Caller(defaultSkip)
 	src := ""
 	if ok {
-		src = fmt.Sprintf("%s:%d", runtime.FuncForPC(pc).Name(), lineno)
+		src = fmt.Sprintf("%s:%s:%d", fileName, runtime.FuncForPC(pc).Name(), lineno)
 	}
 
 	// Make the log record
@@ -338,6 +338,7 @@ func (f *Filter) Print(v ...interface{}) {
 	const (
 		lvl = DEBUG //为了提供gorm log的interface
 	)
+	// todo 如果要支持gorm打印指针参数，这里需要优化
 	arg0 := v[0]
 	args := v[1:]
 	switch first := arg0.(type) {
