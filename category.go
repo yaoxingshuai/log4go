@@ -355,19 +355,19 @@ func (f *Filter) Print(v ...interface{}) {
 }
 
 func (f *Filter) QDebug(ctx context.Context, arg0 string, args ...interface{}) {
-	f.intLogf(DEBUG, getPrefix(ctx, arg0), args)
+	f.intLogf(DEBUG, getPrefix(ctx, arg0), args...)
 }
 
 func (f *Filter) QInfo(ctx context.Context, arg0 string, args ...interface{}) {
-	f.intLogf(INFO, getPrefix(ctx, arg0), args)
+	f.intLogf(INFO, getPrefix(ctx, arg0), args...)
 }
 
 func (f *Filter) QWarn(ctx context.Context, arg0 string, args ...interface{}) {
-	f.intLogf(WARNING, getPrefix(ctx, arg0), args)
+	f.intLogf(WARNING, getPrefix(ctx, arg0), args...)
 }
 
 func (f *Filter) QError(ctx context.Context, arg0 string, args ...interface{}) {
-	f.intLogf(ERROR, getPrefix(ctx, arg0), args)
+	f.intLogf(ERROR, getPrefix(ctx, arg0), args...)
 }
 
 func getPrefix(ctx context.Context, arg0 string) string {
