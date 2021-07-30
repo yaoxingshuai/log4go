@@ -282,23 +282,18 @@ func Critical(arg0 interface{}, args ...interface{}) error {
 	return nil
 }
 
-func QDebug(ctx context.Context, arg0 string, args ...interface{}) error {
+func QDebug(ctx context.Context, arg0 string, args ...interface{}) {
 	Global.intLogf(DEBUG, getPrefix(ctx, arg0), args...)
-	return nil
 }
-func QInfo(ctx context.Context, arg0 string, args ...interface{}) error {
+func QInfo(ctx context.Context, arg0 string, args ...interface{}) {
 	Global.intLogf(INFO, getPrefix(ctx, arg0), args...)
-	return nil
 }
-func QWarn(ctx context.Context, arg0 string, args ...interface{}) error {
+func QWarn(ctx context.Context, arg0 string, args ...interface{}) {
 	Global.intLogf(WARNING, getPrefix(ctx, arg0), args...)
-	return nil
 }
-func QError(ctx context.Context, arg0 string, args ...interface{}) error {
+func QError(ctx context.Context, arg0 string, args ...interface{}) {
 	Global.intLogf(ERROR, getPrefix(ctx, arg0), args...)
-	return nil
 }
-func QCritical(ctx context.Context, arg0 string, args ...interface{}) error {
+func QCritical(ctx context.Context, arg0 string, args ...interface{}) {
 	Global.intLogf(CRITICAL, getPrefix(ctx, arg0), args...)
-	return nil
 }
